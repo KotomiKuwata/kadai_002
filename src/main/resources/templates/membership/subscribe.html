@@ -1,0 +1,128 @@
+<!DOCTYPE html>
+<html xmlns:th="https://www.thymeleaf.org" xmlns:sec="http://www.thymeleaf.org/extras/spring-security">
+
+<head>
+	<div th:replace="~{fragment :: meta}"></div>
+	<div th:replace="~{fragment :: styles}"></div>
+	<title>有料会員申込</title>
+	<link th:href="@{/css/style.css}" rel="stylesheet">
+</head>
+
+<body>
+	<div class="kadai_002-wrapper">
+		<!-- ヘッダー -->
+		<div th:replace="~{fragment :: header}"></div>
+
+		<main>
+			<div class="container pb-5 kadai_002-container">
+				<div class="row justify-content-center">
+					<div class="col-xl-5 col-lg-6 col-md-8">
+						<nav class="my-3" style="--bs-breadcrumb-divider: '>';" aria-label="breadcrumb">
+							<ol class="breadcrumb mb-0">
+								<li class="breadcrumb-item"><a th:href="@{/}">ホーム</a></li>
+								<li class="breadcrumb-item"><a th:href="@{/user}">会員情報</a></li>
+								<li class="breadcrumb-item active" aria-current="page">有料会員申込</li>
+							</ol>
+						</nav>
+
+						<h1 class="mb-3 text-center">有料会員申込</h1>
+						<div th:if="${errorMessage}" class="alert alert-danger" role="alert">
+							<span th:text="${errorMessage}"></span>
+						</div>
+
+						<div id="payment-form">
+							<div class="container mb-4">
+								<!-- 利用規約 -->
+								<div id="terms">
+									<h2>利用規約</h2>
+									<p>この利用規約（以下「本規約」といいます。）は、当社が提供するサブスクリプションサービス（以下「本サービス」といいます。）の利用に関して、お客様と当社との間の権利義務関係を定めるものです。
+									</p>
+
+									<h3>第1条（目的）</h3>
+									<p>本規約は、本サービスの利用に関して、お客様と当社との間の権利義務関係を定めることを目的とします。</p>
+
+									<h3>第2条（適用）</h3>
+									<p>本規約は、本サービスを利用する全てのお客様に適用されます。本規約の内容とその他のサービス料支払いに関する規約の定めに矛盾抵触がある場合は、本規約が優先されます。
+									</p>
+
+									<h3>第3条（本サービスの利用方法）</h3>
+									<p>お客様は、本サービスを利用するために、本規約の全文を確認し同意した上で、当社所定の方法により利用登録をしなければなりません。</p>
+
+									<h3>第4条（契約の成立）</h3>
+									<p>本サービスの利用契約は、お客様が利用登録をした後、利用申込みをし、これに対して当社が承諾したときに成立します。</p>
+
+									<h3>第5条（契約期間）</h3>
+									<p>本契約の契約期間は、お客様が選択したサービスメニューに基づきます。契約期間満了日に自動的に更新されます。</p>
+
+									<h3>第6条（料金および支払方法）</h3>
+									<p>お客様は、本サービスの利用料として月額300円を支払うものとします。支払方法は、クレジットカード決済とします。</p>
+
+									<h3>第7条（解約）</h3>
+									<p>お客様は、解約を希望する場合、当社所定の方法により解約手続きを行うものとします。解約手続きが完了した月の末日をもって解約となります。</p>
+
+									<h3>第8条（免責事項）</h3>
+									<p>当社は、本サービスの提供に関して、故意または重過失がない限り、一切の責任を負いません。</p>
+
+									<h3>第9条（準拠法および管轄）</h3>
+									<p>本規約は日本法に準拠し、日本の裁判所を専属的合意管轄とします。</p>
+								</div>
+
+								<div class="row pb-2 mb-2">
+									<div class="col">
+										<div class="form-check">
+											<input class="form-check-input" type="checkbox" id="termsCheckbox">
+											<label class="form-check-label" for="termsCheckbox">
+												利用規約に同意します
+											</label>
+										</div>
+									</div>
+								</div>
+
+								<div class="row pb-2 mb-2">
+									<div class="col text-center">
+										<div class="d-flex justify-content-center">
+											<form th:action="@{/membership/subscribe}" method="post">
+												<p>月額料金: 300円</p>
+												<button id="paymentButton"
+													class="btn text-white shadow-sm w-100 kadai_002-btn"
+													th:data-session-id="${sessionId}">
+													有料会員になる
+												</button>
+											</form>
+										</div>
+									</div>
+								</div>
+							</div>
+						</div>
+
+					</div>
+				</div>
+			</div>
+		</main>
+
+		<!-- フッター -->
+		<div th:replace="~{fragment :: footer}"></div>
+	</div>
+
+	<div th:replace="~{fragment :: scripts}"></div>
+	<script src="https://js.stripe.com/v3"></script>
+	<script th:inline="javascript">
+		const sessionId = /*[[${sessionId}]]*/"sessionId";
+		console.log(sessionId);
+		document.addEventListener("DOMContentLoaded", function () {
+			// 利用規約のチェックボックスを監視
+			var termsCheckbox = document.getElementById('termsCheckbox');
+			var paymentButton = document.getElementById('paymentButton');
+
+			termsCheckbox.addEventListener('change', function () {
+				paymentButton.disabled = !termsCheckbox.checked;
+			});
+
+			// 初期状態の設定
+			paymentButton.disabled = !termsCheckbox.checked;
+		});
+	</script>
+	<script th:src="@{/js/stripe.js}"></script>
+</body>
+
+</html>

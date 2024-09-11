@@ -1,0 +1,77 @@
+<!DOCTYPE html>
+<html xmlns:th="https://www.thymeleaf.org" xmlns:sec="http://www.thymeleaf.org/extras/spring-security">
+
+<head>
+	<div th:replace="~{fragment :: meta}"></div>
+
+	<div th:replace="~{fragment :: styles}"></div>
+
+	<title>有料会員解約</title>
+</head>
+
+<body>
+	<div class="kadai_002-wrapper">
+		<!-- ヘッダー -->
+		<div th:replace="~{fragment :: header}"></div>
+
+		<main>
+			<div class="container pb-5 kadai_002-container">
+				<div class="row justify-content-center">
+					<div class="col-xl-5 col-lg-6 col-md-8">
+						<nav class="my-3" style="--bs-breadcrumb-divider: '>';" aria-label="breadcrumb">
+							<ol class="breadcrumb mb-0">
+								<li class="breadcrumb-item"><a th:href="@{/}">ホーム</a></li>
+								<li class="breadcrumb-item active" aria-current="page">解約</li>
+							</ol>
+						</nav>
+						<h1 class="mb-4 text-center">解約手続き</h1>
+
+						<div class="container">
+							<h1>有料会員解約確認</h1>
+							<p>有料会員を解約する前に、以下の注意事項をご確認ください：</p>
+							<ul>
+								<li>解約後は有料会員の特典が利用できなくなります。</li>
+								<li>解約時点で未使用の有料会員期間の返金はありません。</li>
+								<li>解約すると、登録されているカード情報は削除されます。</li>
+								<li>再度有料会員になる場合は、新規登録が必要です。</li>
+							</ul>
+							<p>上記の内容をご理解いただき、解約を希望される場合は以下のチェックボックスにチェックを入れてください。</p>
+						</div>
+
+						<div class="form-group d-flex justify-content-center my-4">
+							<div class="col text-center">
+								<form th:action="@{/cancel-subscription}" method="post">
+									<div class="form-check mb-3">
+										<input class="form-check-input" type="checkbox" id="confirmCancel" required>
+										<label class="form-check-label" for="confirmCancel">
+											上記の注意事項を理解し、有料会員の解約に同意します。
+										</label>
+									</div>
+									<button type="submit" class="btn text-white shadow-sm kadai_002-btn"
+										id="cancelButton" disabled>有料会員解約</button>
+								</form>
+							</div>
+						</div>
+					</div>
+				</div>
+			</div>
+		</main>
+
+		<!-- フッター -->
+		<div th:replace="~{fragment :: footer}"></div>
+	</div>
+
+	<div th:replace="~{fragment :: scripts}"></div>
+	<script>
+		document.addEventListener('DOMContentLoaded', function () {
+			const checkbox = document.getElementById('confirmCancel');
+			const button = document.getElementById('cancelButton');
+
+			checkbox.addEventListener('change', function () {
+				button.disabled = !this.checked;
+			});
+		});
+	</script>
+</body>
+
+</html>

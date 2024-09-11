@@ -1,0 +1,124 @@
+<!DOCTYPE html>
+<html xmlns:th="https://www.thymeleaf.org" xmlns:sec="http://www.thymeleaf.org/extras/spring-security">
+
+<head>
+	<div th:replace="~{fragment :: meta}"></div>
+	<div th:replace="~{fragment :: styles}"></div>
+	<title>店舗一覧</title>
+</head>
+
+<body>
+	<div class="kadai_002-wrapper">
+		<!-- ヘッダー -->
+		<div th:replace="~{fragment :: header}"></div>
+		<main>
+			<div class="container kadai_002-container pb-5">
+				<div class="row justify-content-center">
+					<nav class="my-3" style="--bs-breadcrumb-divider: '>';" aria-label="breadcrumb">
+						<ol class="breadcrumb mb-0">
+							<li class="breadcrumb-item"><a th:href="@{/}">ホーム</a></li>
+							<li class="breadcrumb-item active" aria-current="page">店舗一覧</li>
+						</ol>
+					</nav>
+
+					<div class="col-xl-3 col-lg-4 col-md-12">
+
+						<form method="get" th:action="@{/stores}" class="w-100 mb-3">
+							<div class="input-group">
+								<input type="text" class="form-control" name="keyword" th:value="${keyword}"
+									placeholder="店舗名">
+								<button type="submit" class="btn text-white shadow-sm kadai_002-btn">検索</button>
+							</div>
+						</form>
+						<form method="get" th:action="@{/stores}" class="w-100 mb-3">
+							<div class="input-group">
+								<select id="categoryName" class="form-control" name="categoryName">
+									<option value="" disabled selected>カテゴリを選択してください</option>
+									<option th:each="category : ${categories}" th:value="${category.name}"
+										th:text="${category.name}"></option>
+								</select>
+								<button type="submit" class="btn text-white shadow-sm kadai_002-btn">検索</button>
+							</div>
+						</form>
+
+					</div>
+
+
+					<div class="col">
+						<div class="d-flex justify-content-between flex-wrap">
+							<p th:if="${storePage.getTotalPages() > 1}" class="fs-5 mb-3"
+								th:text="'検索結果：' + ${storePage.getTotalElements()} + '件' + '（' + (${storePage.getNumber() + 1}) + ' / ' + ${storePage.getTotalPages()} + ' ページ）'">
+							</p>
+							<p th:unless="${storePage.getTotalPages() > 1}" class="fs-5 mb-3"
+								th:text="'検索結果：' + ${storePage.getTotalElements()} + '件'"></p>
+						</div>
+						<div class="mb-3" th:each="store : ${storePage}">
+							<a th:href="@{/stores/__${store.getId()}__}" class="link-dark kadai_002-card-link">
+								<div class="card h-100">
+									<div class="row g-0">
+										<div class="col-md-4">
+											<img th:if="${store.getImageName()}"
+												th:src="@{/storage/{imageName}(imageName=${store.getImageName()})}"
+												class="card-img-top kadai_002-horizontal-card-image" alt="店舗画像">
+											<img th:unless="${store.getImageName()}" th:src="@{/images/noImage.png}"
+												class="card-img-top kadai_002-horizontal-card-image" alt="NO IMAGE">
+										</div>
+										<div class="col-md-8">
+											<div class="card-body">
+												<h3 class="card-title mb-3" th:text="${store.getName()}"></h3>
+												<hr class="mb-3">
+												<p class="card-text mb-2">
+													<span th:text="${store.getDescription()}"></span>
+												</p>
+												<p class="card-text mb-2">
+													<small class="text-muted"
+														th:text="'〒' + ${store.getPostalCode()}"></small>
+													<small class="text-muted" th:text="${store.getAddress()}"></small>
+												</p>
+												<p class="card-text mb-2">
+													<span th:text="${store.getCategory().getName()}"></span>
+												</p>
+											</div>
+										</div>
+									</div>
+								</div>
+							</a>
+						</div>
+						<!-- ページネーション -->
+						<div th:if="${storePage.getTotalPages() > 1}" class="d-flex justify-content-center">
+							<nav aria-label="店舗一覧ページ">
+								<ul class="pagination">
+									<li class="page-item">
+										<span th:if="${storePage.isFirst()}" class="page-link disabled">前</span>
+										<a th:unless="${storePage.isFirst()}"
+											th:href="@{/stores(page=${storePage.getNumber() - 1}, keyword=${keyword}, categoryName=${categoryName})}"
+											class="page-link kadai_002-page-link">前</a>
+									</li>
+									<li th:each="i : ${#numbers.sequence(0, storePage.getTotalPages() - 1)}"
+										class="page-item">
+										<span th:if="${i == storePage.getNumber()}"
+											class="page-link active kadai_002-active" th:text="${i + 1}"></span>
+										<a th:unless="${i == storePage.getNumber()}"
+											th:href="@{/stores(page=${i}, keyword=${keyword}, categoryName=${categoryName})}"
+											class="page-link kadai_002-page-link" th:text="${i + 1}"></a>
+									</li>
+									<li class="page-item">
+										<span th:if="${storePage.isLast()}" class="page-link disabled">次</span>
+										<a th:unless="${storePage.isLast()}"
+											th:href="@{/stores(page=${storePage.getNumber() + 1}, keyword=${keyword}, categoryName=${categoryName})}"
+											class="page-link kadai_002-page-link">次</a>
+									</li>
+								</ul>
+							</nav>
+						</div>
+					</div>
+				</div>
+			</div>
+		</main>
+		<!-- フッター -->
+		<div th:replace="~{fragment :: footer}"></div>
+	</div>
+	<div th:replace="~{fragment :: scripts}"></div>
+</body>
+
+</html>

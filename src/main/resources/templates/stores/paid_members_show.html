@@ -1,0 +1,290 @@
+<!DOCTYPE html>
+<html xmlns:th="https://www.thymeleaf.org" xmlns:sec="http://www.thymeleaf.org/extras/spring-security">
+
+<head>
+	<div th:replace="~{fragment :: meta}"></div>
+
+	<div th:replace="~{fragment :: styles}"></div>
+
+	<!-- Flatpickr -->
+	<link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/flatpickr/dist/flatpickr.min.css">
+
+	<title>店舗詳細</title>
+</head>
+
+<body>
+	<div class="kadai_002-wrapper">
+		<!-- ヘッダー -->
+		<div th:replace="~{fragment :: header}"></div>
+
+		<main>
+			<div class="container pt-4 pb-5 kadai_002-container">
+				<div class="row justify-content-center">
+					<div class="col-xxl-9 col-xl-10 col-lg-11">
+						<nav class="mb-4" style="--bs-breadcrumb-divider: '>';" aria-label="breadcrumb">
+							<ol class="breadcrumb mb-0">
+								<li class="breadcrumb-item"><a th:href="@{/}">ホーム</a></li>
+								<li class="breadcrumb-item"><a th:href="@{/stores}">店舗一覧</a></li>
+								<li class="breadcrumb-item active" aria-current="page">店舗詳細</li>
+							</ol>
+						</nav>
+
+						<h1 class="mb-4 text-center" th:text="${store.getName()}"></h1>
+
+						<div sec:authorize="isAnonymous()" class="col-lg-4 px-0 ps-lg-4 mb-4">
+							<div class="d-flex justify-content-end align-items-end mb-3">
+								<div>
+									<p class="card-text">お気に入り登録するには<a th:href="@{/login}">ログイン</a>が必要です。</p>
+								</div>
+							</div>
+						</div>
+
+						<div sec:authorize="isAuthenticated()" class="mb-4">
+							<form th:if="${isFavorite != null and !isFavorite}"
+								th:action="@{/stores/{id}/favorite(id=${store.id})}" method="post">
+								<button type="submit" class="btn kadai_002-btn text-white">お気に入りに追加</button>
+							</form>
+							<form th:if="${isFavorite != null and isFavorite}"
+								th:action="@{/stores/{id}/unfavorite(id=${store.id})}" method="post">
+								<button type="submit" class="btn kadai_002-btn text-white">お気に入りから削除</button>
+							</form>
+						</div>
+
+						<div th:if="${errorMessage}" class="alert alert-danger">
+							<span th:text="${errorMessage}"></span>
+						</div>
+
+						<div class="mb-4">
+							<img th:if="${store.getImageName()}" th:src="@{/storage/__${store.getImageName()}__}"
+								class="w-100" alt="店舗画像">
+							<img th:unless="${store.getImageName()}" th:src="@{/images/noImage.png}" class="w-100"
+								alt="NO IMAGE">
+						</div>
+
+						<div class="container">
+							<div class="row">
+								<div class="col-lg-8 container mb-4">
+									<div class="row pb-2 mb-2 border-bottom">
+										<div class="col-4">
+											<span class="fw-bold">店舗名</span>
+										</div>
+
+										<div class="col">
+											<span th:text="${store.getName()}"></span>
+										</div>
+									</div>
+
+									<div class="row pb-2 mb-2 border-bottom">
+										<div class="col-4">
+											<span class="fw-bold">説明</span>
+										</div>
+
+										<div class="col">
+											<span class="kadai_002-pre-wrap" th:text="${store.getDescription()}"></span>
+										</div>
+									</div>
+
+									<div class="row pb-2 mb-2 border-bottom">
+										<div class="col-4">
+											<span class="fw-bold">開店時間</span>
+										</div>
+
+										<div class="col">
+											<span class="kadai_002-pre-wrap"
+												th:text="${#temporals.format(store.getOpeningHours(), 'HH:mm')}"></span>
+										</div>
+									</div>
+
+									<div class="row pb-2 mb-2 border-bottom">
+										<div class="col-4">
+											<span class="fw-bold">閉店時間</span>
+										</div>
+										<div class="col">
+											<span class="kadai_002-pre-wrap"
+												th:text="${#temporals.format(store.getClosingTime(), 'HH:mm')}"></span>
+										</div>
+									</div>
+
+									<div class="row pb-2 mb-2 border-bottom">
+										<div class="col-4">
+											<span class="fw-bold">郵便番号</span>
+										</div>
+
+										<div class="col">
+											<span th:text="${store.getPostalCode()}"></span>
+										</div>
+									</div>
+
+									<div class="row pb-2 mb-2 border-bottom">
+										<div class="col-4">
+											<span class="fw-bold">住所</span>
+										</div>
+
+										<div class="col">
+											<span th:text="${store.getAddress()}"></span>
+										</div>
+									</div>
+
+									<div class="row pb-2 mb-2 border-bottom">
+										<div class="col-4">
+											<span class="fw-bold">電話番号</span>
+										</div>
+
+										<div class="col">
+											<span th:text="${store.getPhoneNumber()}"></span>
+										</div>
+									</div>
+
+									<div class="row pb-2 mb-2 border-bottom">
+										<div class="col-4">
+											<span class="fw-bold">定休日</span>
+										</div>
+										<div class="col">
+											<span th:text="${store.getClosedDay()}"></span>
+										</div>
+									</div>
+
+									<div class="row pb-2 mb-2 border-bottom">
+										<div class="col-4">
+											<span class="fw-bold">カテゴリ</span>
+										</div>
+										<div class="col">
+											<span th:text="${store.getCategory().getName()}"></span>
+										</div>
+									</div>
+								</div>
+
+								<div class="row pb-2 mb-2 border-bottom">
+									<h4 class="text-center mb-3">レビュー</h4>
+
+									<div class="row row-cols-lg-3 row-cols-1 g-3 mb-5">
+										<div class="col" th:each="review : ${reviews}">
+											<div class="card h-100">
+												<div class="card-body">
+													<h6 class="card-subtitle mb-2 text-muted"
+														th:text="${#temporals.format(review.timestamp, 'yyyy-MM-dd HH:mm')}">
+													</h6>
+													<div class="mb-2">
+														<span class="text-warning"
+															th:text="${'★'.repeat(review.rating)}"></span>
+													</div>
+													<p class="card-text" th:text="${review.comment}"></p>
+												</div>
+											</div>
+										</div>
+									</div>
+								</div>
+
+								<div sec:authorize="isAnonymous()" class="col-lg-4 px-0 ps-lg-4 mb-4">
+									<div class="card">
+										<div class="card-body">
+											<p class="card-text">レビュー投稿するには<a th:href="@{/login}">ログイン</a>が必要です。</p>
+											<button type="submit" class="btn text-white shadow-sm w-100 kadai_002-btn"
+												disabled>投稿する</button>
+										</div>
+									</div>
+								</div>
+
+								<div sec:authorize="isAuthenticated()" class="col-lg-4 px-0 ps-lg-4 mb-4">
+									<div class="card">
+										<div class="card-body">
+											<form method="get" th:action="@{/stores/{id}/reviews/input}"
+												th:object="${reviewInputForm}">
+
+												<div class="form-group mb-2">
+													<label for="rating"
+														class="col-form-label text-md-left fw-bold">評価：</label>
+													<select th:field="*{rating}" class="form-control">
+														<option value="1">★</option>
+														<option value="2">★★</option>
+														<option value="3">★★★</option>
+														<option value="4">★★★★</option>
+														<option value="5">★★★★★</option>
+													</select>
+													<span th:if="${#fields.hasErrors('rating')}" th:errors="*{rating}"
+														class="text-danger small"></span>
+												</div>
+
+												<div class="form-group mb-2">
+													<label for="comment"
+														class="col-form-label text-md-left fw-bold">コメント：</label>
+													<textarea th:field="*{comment}" class="form-control"
+														required=""></textarea>
+													<span th:if="${#fields.hasErrors('comment')}" th:errors="*{comment}"
+														class="text-danger small"></span>
+												</div>
+
+												<div class="form-group d-flex justify-content-center my-4">
+													<button type="submit"
+														class="btn text-white shadow-sm w-50 kadai_002-btn">投稿する</button>
+												</div>
+											</form>
+										</div>
+									</div>
+								</div>
+
+								<div sec:authorize="isAnonymous()" class="col-lg-4 px-0 ps-lg-4 mb-4">
+									<div class="card">
+										<div class="card-body">
+											<p class="card-text">予約するには<a th:href="@{/login}">ログイン</a>が必要です。</p>
+											<button type="submit" class="btn text-white shadow-sm w-100 kadai_002-btn"
+												disabled>予約する</button>
+										</div>
+									</div>
+								</div>
+
+								<div sec:authorize="isAuthenticated()" class="col-lg-4 px-0 ps-lg-4 mb-4">
+									<div class="card">
+										<div class="card-body">
+
+											<form method="get"
+												th:action="@{/stores/__${store.getId}__/reservations/input}"
+												th:object="${reservationInputForm}">
+												<div class="form-group mb-2">
+													<!--/stores/{id}/reservations(id=${store.getId()})/input-->
+													<label for="reservationDatetime"
+														class="col-form-label text-md-left fw-bold">来店日時</label>
+													<div th:if="${#fields.hasErrors('reservationDatetime')}"
+														class="text-danger small mb-2"
+														th:errors="*{reservationDatetime}">
+													</div>
+													<input type="datetime-local" class="form-control"
+														th:field="*{reservationDatetime}" step="900">
+												</div>
+
+												<div class="form-group mb-4">
+													<label for="numberOfPeople"
+														class="col-form-label text-md-left fw-bold">来店人数</label>
+													<div th:if="${#fields.hasErrors('numberOfPeople')}"
+														class="text-danger small mb-2" th:errors="*{numberOfPeople}">
+													</div>
+													<input type="number" class="form-control"
+														th:field="*{numberOfPeople}" min="1">
+												</div>
+												<div class="form-group d-flex justify-content-center my-4">
+													<button type="submit"
+														class="btn text-white shadow-sm w-50 kadai_002-btn">予約する</button>
+												</div>
+											</form>
+										</div>
+									</div>
+								</div>
+							</div>
+						</div>
+					</div>
+				</div>
+			</div>
+		</main>
+
+		<!-- フッター -->
+		<div th:replace="~{fragment :: footer}"></div>
+	</div>
+	<!-- Flatpickr -->
+	<script src="https://cdn.jsdelivr.net/npm/flatpickr"></script>
+	<script src="https://cdn.jsdelivr.net/npm/flatpickr/dist/l10n/ja.js"></script>
+	<script th:src="@{/js/flatpickr.js}"></script>
+
+	<div th:replace="~{fragment :: scripts}"></div>
+</body>
+
+</html>

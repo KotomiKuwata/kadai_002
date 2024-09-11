@@ -1,0 +1,83 @@
+<!DOCTYPE html>
+<html xmlns:th="https://www.thymeleaf.org" xmlns:sec="http://www.thymeleaf.org/extras/spring-security">
+
+<head>
+	<div th:replace="~{fragment :: meta}"></div>
+	<div th:replace="~{fragment :: styles}"></div>
+	<title>カード情報</title>
+</head>
+
+<body>
+	<div class="kadai_002-wrapper">
+		<div th:replace="~{fragment :: header}"></div>
+		<main>
+			<div class="container pb-5 kadai_002-container">
+				<div class="row justify-content-center">
+					<div class="col-xl-5 col-lg-6 col-md-8">
+						<nav class="my-3" style="--bs-breadcrumb-divider: '>';" aria-label="breadcrumb">
+							<ol class="breadcrumb mb-0">
+								<li class="breadcrumb-item"><a th:href="@{/}">ホーム</a></li>
+								<li class="breadcrumb-item"><a th:href="@{/membership/info}">会員情報</a></li>
+								<li class="breadcrumb-item active" aria-current="page">カード情報</li>
+							</ol>
+						</nav>
+						<div th:if="${user.isPaidMember}">
+							<h2>カード情報</h2>
+							<p>カード番号（下4桁）: <span th:text="${user.cardLast4}"></span></p>
+							<p>有効期限: <span th:text="${user.cardExpMonth + '/' + user.cardExpYear}"></span></p>
+						</div>
+						<form id="payment-form" th:action="@{/membership/update-payment-method}" method="post">
+							<div class="mb-3">
+								<label for="card-number" class="form-label">カード番号</label>
+								<div id="card-number" class="form-control StripeElement"></div>
+							</div>
+							<div class="row mb-3">
+								<div class="col">
+									<label for="card-expiry" class="form-label">有効期限</label>
+									<div id="card-expiry" class="form-control StripeElement"></div>
+								</div>
+								<div class="col">
+									<label for="card-cvc" class="form-label">セキュリティコード</label>
+									<div id="card-cvc" class="form-control StripeElement"></div>
+								</div>
+							</div>
+							<button type="submit" class="btn btn-primary">カード情報の変更はこちら</button>
+						</form>
+					</div>
+				</div>
+			</div>
+		</main>
+		<div th:replace="~{fragment :: footer}"></div>
+	</div>
+	<div th:replace="~{fragment :: scripts}"></div>
+	<script src="https://js.stripe.com/v3/"></script>
+	<script th:inline="javascript">
+		const stripe = Stripe('pk_test_51PjGIyFRY5VG4shkpqJOgbBIKa42NRQ4ZHuP5C03X6btIJnLFaAunpdOBc9t9fc04txhW8BiGFvdjkQIxb15gk0D00fYp1C0Uy');
+		const elements = stripe.elements();
+		const cardNumber = elements.create('cardNumber');
+		cardNumber.mount('#card-number');
+		const cardExpiry = elements.create('cardExpiry');
+		cardExpiry.mount('#card-expiry');
+		const cardCvc = elements.create('cardCvc');
+		cardCvc.mount('#card-cvc');
+		const form = document.getElementById('payment-form');
+
+		form.addEventListener('submit', async (event) => {
+			event.preventDefault();
+			const {token, error} = await stripe.createToken(cardNumber);
+			if (error) {
+				const errorElement = document.getElementById('card-errors');
+				errorElement.textContent = error.message;
+			} else {
+				const hiddenInput = document.createElement('input');
+				hiddenInput.setAttribute('type', 'hidden');
+				hiddenInput.setAttribute('name', 'stripeToken');
+				hiddenInput.setAttribute('value', token.id);
+				form.appendChild(hiddenInput);
+				form.submit();
+			}
+		});
+	</script>
+</body>
+
+</html>

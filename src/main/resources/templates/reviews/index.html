@@ -1,0 +1,125 @@
+<!DOCTYPE html>
+<html xmlns:th="https://www.thymeleaf.org" xmlns:sec="http://www.thymeleaf.org/extras/spring-security">
+
+<head>
+	<div th:replace="~{fragment :: meta}"></div>
+	<div th:replace="~{fragment :: styles}"></div>
+	<title>レビュー一覧</title>
+</head>
+
+<body>
+	<div class="samuraitravel-wrapper">
+		<!-- ヘッダー -->
+		<div th:replace="~{fragment :: header}"></div>
+		<main>
+			<div class="container samuraitravel-container pb-5">
+				<div class="row justify-content-center">
+					<div class="col-xxl-9 col-xl-10 col-lg-11">
+						<nav class="my-3" style="--bs-breadcrumb-divider: '>';" aria-label="breadcrumb">
+							<ol class="breadcrumb mb-0">
+								<li class="breadcrumb-item"><a th:href="@{/}">ホーム</a></li>
+								<li class="breadcrumb-item active" aria-current="page">レビュー一覧</li>
+							</ol>
+						</nav>
+						<h1 class="mb-4 text-center">レビュー一覧</h1>
+						<div th:if="${param.reviewed}" class="alert alert-info">
+							投稿が完了しました。
+						</div>
+						<table class="table">
+							<thead>
+								<tr>
+									<th>ID</th>
+									<th>店舗名</th>
+									<th>評価</th>
+									<th>コメント</th>
+									<th>投稿日時</th>
+									<th scope="col"></th>
+									<th scope="col"></th>
+								</tr>
+							</thead>
+							<tbody>
+								<tr th:each="review : ${reviewPage}">
+									<td th:text="${review.id}"></td>
+									<td th:text="${review.store.getName()}"></td>
+									<td th:text="${review.rating}"></td>
+									<td th:text="${review.comment}"></td>
+									<td th:text="${#temporals.format(review.timestamp, 'yyyy-MM-dd HH:mm')}"></td>
+									<td><a th:href="@{/reviews/__${review.getId()}__/edit}">編集</a></td>
+									<td>
+										<a href="#" class="kadai_002-link-danger" data-bs-toggle="modal"
+											th:data-bs-target="'#deleteReviewModal' + ${review.getId()}">削除</a>
+										<!-- 削除用モーダル -->
+										<div class="modal fade" th:id="'deleteReviewModal' + ${review.getId()}"
+											tabindex="-1"
+											th:aria-labelledby="'deleteReviewModalLabel' + ${review.getId()}">
+											<div class="modal-dialog">
+												<div class="modal-content">
+													<div class="modal-header">
+														<h5 class="modal-title"
+															th:id="'deleteReviewModalLabel' + ${review.getId()}">
+															レビューの削除確認</h5>
+														<button type="button" class="btn-close" data-bs-dismiss="modal"
+															aria-label="閉じる"></button>
+													</div>
+													<div class="modal-body">
+														このレビューを削除してもよろしいですか？
+													</div>
+													<div class="modal-footer">
+														<button type="button" class="btn btn-secondary"
+															data-bs-dismiss="modal">キャンセル</button>
+														<form th:action="@{/reviews/{id}/delete(id=${review.getId()})}"
+															method="post">
+															<button type="submit" class="btn btn-danger">削除</button>
+														</form>
+													</div>
+												</div>
+											</div>
+										</div>
+									</td>
+								</tr>
+							</tbody>
+						</table>
+						<!-- ページネーション -->
+						<div th:if="${reviewPage.getTotalPages() > 1}" class="d-flex justify-content-center">
+							<nav aria-label="レビュー一覧ページ">
+								<ul class="pagination">
+									<li class="page-item">
+										<span th:if="${reviewPage.isFirst()}" class="page-link disabled">前</span>
+										<a th:unless="${reviewPage.isFirst()}"
+											th:href="@{/reviews(page = ${reviewPage.getNumber() - 1})}"
+											class="page-link samuraitravel-page-link">前</a>
+									</li>
+									<li th:each="i : ${#numbers.sequence(0, reviewPage.getTotalPages() - 1)}"
+										class="page-item">
+										<span th:if="${i == reviewPage.getNumber()}"
+											class="page-link active samuraitravel-active" th:text="${i + 1}"></span>
+										<a th:unless="${i == reviewPage.getNumber()}" th:href="@{/reviews(page = ${i})}"
+											class="page-link samuraitravel-page-link" th:text="${i + 1}"></a>
+									</li>
+									<li class="page-item">
+										<span th:if="${reviewPage.isLast()}" class="page-link disabled">次</span>
+										<a th:unless="${reviewPage.isLast()}"
+											th:href="@{/reviews(page = ${reviewPage.getNumber() + 1})}"
+											class="page-link samuraitravel-page-link">次</a>
+									</li>
+								</ul>
+							</nav>
+						</div>
+					</div>
+				</div>
+			</div>
+		</main>
+		<!-- フッター -->
+		<footer>
+			<div class="d-flex justify-content-center align-items-center h-100">
+				<p class="text-center text-muted small mb-0">&copy; NAGOYAMESHI All rights reserved.</p>
+			</div>
+		</footer>
+	</div>
+	<!-- Bootstrap -->
+	<script src="https://cdn.jsdelivr.net/npm/bootstrap@5.2.3/dist/js/bootstrap.bundle.min.js"
+		integrity="sha384-kenU1KFdBIe4zVF0s0G1M5b4hcpxyD9F7jL+jjXkk+Q2h455rYXK/7HAuoJl+0I4"
+		crossorigin="anonymous"></script>
+</body>
+
+</html>

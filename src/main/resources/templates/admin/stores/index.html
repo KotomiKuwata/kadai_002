@@ -1,0 +1,144 @@
+<!DOCTYPE html>
+<html xmlns:th="https://www.thymeleaf.org" xmlns:sec="http://www.thymeleaf.org/extras/spring-security">
+
+
+<head>
+	<div th:replace="~{fragment :: meta}"></div>
+	<div th:replace="~{fragment :: styles}"></div>
+	<link th:href="@{/css/style.css}" rel="stylesheet">
+	<title>店舗一覧</title>
+</head>
+
+<body>
+	<div class="kadai_002-wrapper">
+		<!-- ヘッダー -->
+		<div th:replace="~{fragment :: header}"></div>
+		<main>
+			<div class="container pt-4 pb-5 kadai_002-container">
+				<div class="row justify-content-center">
+					<div class="col-xxl-9 col-xl-10 col-lg-11">
+						<h1 class="mb-4 text-center">店舗一覧</h1>
+						<div class="d-flex justify-content-between align-items-end flex-wrap">
+
+							<form method="get" th:action="@{/admin/stores}" class="mb-3">
+								<div class="input-group">
+									<input type="text" class="form-control" name="keyword" th:value="${keyword}"
+										placeholder="店舗名">
+									<button type="submit" class="btn text-white shadow-sm kadai_002-btn">検索</button>
+								</div>
+							</form>
+							<form method="get" th:action="@{/admin/stores}" class="mb-3">
+								<div class="input-group">
+									<select id="categoryName" class="form-control" name="categoryName">
+										<option value="" disabled selected>カテゴリを選択してください</option>
+										<option th:each="category : ${categories}" th:value="${category.name}"
+											th:text="${category.name}"></option>
+									</select>
+									<button type="submit" class="btn text-white shadow-sm kadai_002-btn">検索</button>
+								</div>
+							</form>
+
+							<a th:href="@{/admin/stores/register}"
+								class="btn text-white shadow-sm mb-3 kadai_002-btn">登録</a>
+						</div>
+
+
+						<div th:if="${successMessage}" class="alert alert-info">
+							<span th:text="${successMessage}"></span>
+						</div>
+						<table class="table">
+							<thead>
+								<tr>
+									<th scope="col">ID</th>
+									<th scope="col">店舗一覧</th>
+									<th scope="col">開店時間</th>
+									<th scope="col">閉店時間</th>
+									<th scope="col">郵便番号</th>
+									<th scope="col">住所</th>
+									<th scope="col">電話番号</th>
+									<th scope="col">定休日</th>
+									<th scope="col"></th>
+									<th scope="col"></th>
+								</tr>
+							</thead>
+							<tbody>
+								<tr th:each="store : ${storePage}">
+									<td th:text="${store.getId()}"></td>
+									<td th:text="${store.getName()}"></td>
+									<td th:text="${#temporals.format(store.getOpeningHours(), 'HH:mm')}"></td>
+									<td th:text="${#temporals.format(store.getClosingTime(), 'HH:mm')}"></td>
+									<td th:text="${store.getPostalCode()}"></td>
+									<td th:text="${store.getAddress()}"></td>
+									<td th:text="${store.getPhoneNumber()}"></td>
+									<td th:text="${store.getClosedDay()}"></td>
+									<td><a th:href="@{/admin/stores/{storeId}(storeId=${store.getId()})}">詳細</a></td>
+									<td><a href="#" class="kadai_002-link-danger" data-bs-toggle="modal"
+											th:data-bs-target="'#deleteStoreModal' + ${store.getId()}">削除</a>
+
+
+										<!-- 削除用モーダル -->
+										<div class="modal fade" th:id="${'deleteStoreModal' + store.getId()}"
+											tabindex="-1"
+											th:aria-labelledby="${'deleteStoreModalLabel' + store.getId()}">
+											<div class="modal-dialog">
+												<div class="modal-content">
+													<div class="modal-header">
+														<h5 class="modal-title"
+															th:id="${'deleteStoreModalLabel' + store.getId()}"
+															th:text="${store.getName()} + 'を削除してもよろしいですか？'"></h5>
+														<button type="button" class="btn-close" data-bs-dismiss="modal"
+															aria-label="閉じる"></button>
+													</div>
+													<div class="modal-footer">
+														<form method="post"
+															th:action="@{/admin/stores/{storeId}/delete(storeId=${store.getId()})}">
+															<button type="submit"
+																class="btn kadai_002-btn-danger text-white shadow-sm">削除</button>
+														</form>
+													</div>
+												</div>
+											</div>
+										</div>
+								</tr>
+							</tbody>
+						</table>
+
+						<!-- ページネーション -->
+						<div th:if="${storePage.getTotalPages() > 1}" class="d-flex justify-content-center">
+							<nav aria-label="店舗一覧ページ">
+								<ul class="pagination">
+									<li class="page-item">
+										<span th:if="${storePage.isFirst()}" class="page-link disabled">前</span>
+										<a th:unless="${storePage.isFirst()}"
+											th:href="@{/admin/stores(page=${storePage.getNumber() - 1}, keyword=${keyword})}"
+											class="page-link kadai_002-page-link">前</a>
+									</li>
+									<li th:each="i : ${#numbers.sequence(0, storePage.getTotalPages() - 1)}"
+										class="page-item">
+										<span th:if="${i == storePage.getNumber()}"
+											class="page-link active kadai_002-active" th:text="${i + 1}"></span>
+										<a th:unless="${i == storePage.getNumber()}"
+											th:href="@{/admin/stores(page=${i}, keyword=${keyword})}"
+											class="page-link kadai_002-page-link" th:text="${i + 1}"></a>
+									</li>
+									<li class="page-item">
+										<span th:if="${storePage.isLast()}" class="page-link disabled">次</span>
+										<a th:unless="${storePage.isLast()}"
+											th:href="@{/admin/stores(page=${storePage.getNumber() + 1}, keyword=${keyword})}"
+											class="page-link kadai_002-page-link">次</a>
+									</li>
+								</ul>
+							</nav>
+						</div>
+					</div>
+				</div>
+			</div>
+		</main>
+
+		<!-- フッター -->
+		<div th:replace="~{fragment :: footer}"></div>
+	</div>
+	<div th:replace="~{fragment :: scripts}"></div>
+</body>
+
+</html>

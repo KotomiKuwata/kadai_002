@@ -1,0 +1,59 @@
+<!DOCTYPE html>
+<html xmlns:th="https://www.thymeleaf.org" xmlns:sec="http://www.thymeleaf.org/extras/spring-security">
+
+<head>
+	<div th:replace="~{fragment :: meta}"></div>
+	<div th:replace="~{fragment :: styles}"></div>
+	<title>完了情報</title>
+	<link th:href="@{/css/style.css}" rel="stylesheet">
+</head>
+
+<body>
+	<div class="kadai_002-wrapper">
+		<!-- ヘッダー -->
+		<div th:replace="~{fragment :: header}"></div>
+
+		<main>
+			<div class="container pb-5 kadai_002-container">
+				<div class="row justify-content-center">
+					<div class="col-xl-5 col-lg-6 col-md-8">
+						<nav class="my-3" style="--bs-breadcrumb-divider: '>';" aria-label="breadcrumb">
+							<ol class="breadcrumb mb-0">
+								<li class="breadcrumb-item"><a th:href="@{/}">ホーム</a></li>
+								<li class="breadcrumb-item"><a th:href="@{/user}">会員情報</a></li>
+								<li class="breadcrumb-item active" aria-current="page">完了情報</li>
+							</ol>
+						</nav>
+
+						<h1 class="mb-3 text-center">完了情報</h1>
+						<div class="container mb-4">
+							<p>会員種別: <span th:text="${user.isPaidMember} ? '有料会員' : '無料会員'"></span></p>
+							<p>名前: <span th:text="${user.name}"></span></p>
+							<p>メールアドレス: <span th:text="${user.email}"></span></p>
+
+							<!-- カード情報の表示 -->
+							<div th:if="${user.isPaidMember}">
+								<h2 class="mt-4 mb-3">カード情報</h2>
+								<p>カード番号（下4桁）: <span th:text="${user.cardLast4}"></span></p>
+								<p>有効期限: <span th:text="${user.cardExpMonth + '/' + user.cardExpYear}"></span></p>
+							</div>
+						</div>
+					</div>
+				</div>
+			</div>
+		</main>
+		<!-- フッター -->
+		<div th:replace="~{fragment :: footer}"></div>
+	</div>
+
+	<div th:replace="~{fragment :: scripts}"></div>
+</body>
+
+</html>
+
+<!--
+	<div th:if="${user.isPaidMember}">
+									<p>契約開始日: <span th:text="${user.subscriptionStartDate}"></span></p>
+									<p>次回更新日: <span th:text="${user.nextBillingDate}"></span></p>
+								</div>
+								-->
