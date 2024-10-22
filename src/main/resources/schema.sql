@@ -1,3 +1,9 @@
+CREATE TABLE IF NOT EXISTS category
+(
+   id INT NOT NULL AUTO_INCREMENT PRIMARY KEY,
+   name VARCHAR (50) NOT NULL
+);
+
 CREATE TABLE IF NOT EXISTS stores
 (
    id INT NOT NULL AUTO_INCREMENT PRIMARY KEY,
@@ -16,10 +22,31 @@ CREATE TABLE IF NOT EXISTS stores
    FOREIGN KEY (category_id) REFERENCES category (id)
 );
 
-CREATE TABLE IF NOT EXISTS category
-(
-   id INT NOT NULL AUTO_INCREMENT PRIMARY KEY,
-   name VARCHAR (50) NOT NULL
+CREATE TABLE IF NOT EXISTS roles (
+    id INT NOT NULL AUTO_INCREMENT PRIMARY KEY,
+    name VARCHAR(50) NOT NULL
+);
+
+CREATE TABLE IF NOT EXISTS users (
+    id INT NOT NULL AUTO_INCREMENT PRIMARY KEY,
+    name VARCHAR(50) NOT NULL,
+    furigana VARCHAR(50) NOT NULL,
+    date_of_birth DATE NOT NULL,
+    phone_number VARCHAR(50) NOT NULL,
+    email VARCHAR(255) NOT NULL UNIQUE,
+    password VARCHAR(255) NOT NULL,
+    role_id INT NOT NULL,
+    enabled BOOLEAN NOT NULL,
+    is_paid_member BOOLEAN NOT NULL,
+    created_at DATETIME NOT NULL DEFAULT CURRENT_TIMESTAMP,
+    updated_at DATETIME NOT NULL DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP,
+    stripe_customer_id VARCHAR(255),
+    stripe_subscription_id VARCHAR(255),
+    card_last4 VARCHAR(4),
+    card_brand VARCHAR(50),
+    card_exp_month INT,
+    card_exp_year INT,
+    FOREIGN KEY (role_id) REFERENCES roles (id)
 );
 
   CREATE TABLE IF NOT EXISTS verification_tokens (
@@ -68,32 +95,6 @@ CREATE TABLE IF NOT EXISTS reviews (
     FOREIGN KEY (user_id) REFERENCES users(id)
 );
 
-CREATE TABLE IF NOT EXISTS roles (
-    id INT NOT NULL AUTO_INCREMENT PRIMARY KEY,
-    name VARCHAR(50) NOT NULL
-);
-
-CREATE TABLE IF NOT EXISTS users (
-    id INT NOT NULL AUTO_INCREMENT PRIMARY KEY,
-    name VARCHAR(50) NOT NULL,
-    furigana VARCHAR(50) NOT NULL,
-    date_of_birth DATE NOT NULL,
-    phone_number VARCHAR(50) NOT NULL,
-    email VARCHAR(255) NOT NULL UNIQUE,
-    password VARCHAR(255) NOT NULL,
-    role_id INT NOT NULL,
-    enabled BOOLEAN NOT NULL,
-    is_paid_member BOOLEAN NOT NULL,
-    created_at DATETIME NOT NULL DEFAULT CURRENT_TIMESTAMP,
-    updated_at DATETIME NOT NULL DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP,
-    stripe_customer_id VARCHAR(255),
-    stripe_subscription_id VARCHAR(255),
-    card_last4 VARCHAR(4),
-    card_brand VARCHAR(50),
-    card_exp_month INT,
-    card_exp_year INT,
-    FOREIGN KEY (role_id) REFERENCES roles (id)
-);
 
 CREATE TABLE IF NOT EXISTS favorites (
     id INT NOT NULL AUTO_INCREMENT PRIMARY KEY,
