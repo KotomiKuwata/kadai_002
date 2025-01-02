@@ -4,7 +4,7 @@
 <head>
 	<div th:replace="~{fragment :: meta}"></div>
 	<div th:replace="~{fragment :: styles}"></div>
-	<title>予約内容確認</title>
+	<title>予約キャンセル確認</title>
 </head>
 
 <body>
@@ -18,22 +18,26 @@
 						<nav class="mb-4" style="--bs-breadcrumb-divider: '>';" aria-label="breadcrumb">
 							<ol class="breadcrumb mb-0">
 								<li class="breadcrumb-item"><a th:href="@{/}">ホーム</a></li>
-								<li class="breadcrumb-item"><a th:href="@{/stores}">店舗一覧</a></li>
-								<li class="breadcrumb-item"><a th:href="@{/stores/__${store.getId()}__}">店舗詳細</a></li>
-								<li class="breadcrumb-item active" aria-current="page">予約内容確認</li>
+								<li class="breadcrumb-item"><a th:href="@{/reservations}">予約一覧</a></li>
+								<li class="breadcrumb-item active" aria-current="page">予約キャンセル確認</li>
 							</ol>
 						</nav>
 
-						<h1 class="mb-4 text-center">予約内容確認</h1>
+						<h1 class="mb-4 text-center">予約キャンセル確認</h1>
 
-						<form method="post" th:action="@{/stores/{storeId}/reservations/create(storeId=${store.id})}"
-							th:object="${reservationRegisterForm}">
+						<form method="post" th:action="@{/reservations/{id}/delete(id=${reservation.getId()})}"
+							th:object="${reservation}">
 
-							<input type="hidden" th:field="*{storeId}">
-							<input type="hidden" th:field="*{userId}">
-							<input type="hidden" th:field="*{reservationDate}">
-							<input type="hidden" th:field="*{reservationTime}">
-							<input type="hidden" th:field="*{numberOfPeople}">
+							<div class="container mb-4">
+								<div class="row pb-2 mb-2 border-bottom">
+									<div class="col-6">
+										<span class="fw-bold">店舗名</span>
+									</div>
+									<div class="col">
+										<span th:text="${reservation.getStore().getName()}"></span>
+									</div>
+								</div>
+							</div>
 
 							<div class="container mb-4">
 								<div class="row pb-2 mb-2 border-bottom">
@@ -42,7 +46,7 @@
 									</div>
 									<div class="col">
 										<span
-											th:text="${#temporals.format(reservationRegisterForm.reservationDate, 'yyyy-MM-dd')}"></span>
+											th:text="${#temporals.format(reservation.reservationDate, 'yyyy-MM-dd')}"></span>
 									</div>
 								</div>
 							</div>
@@ -54,7 +58,7 @@
 									</div>
 									<div class="col">
 										<span
-											th:text="${#temporals.format(reservationRegisterForm.reservationTime, 'HH:mm')}"></span>
+											th:text="${#temporals.format(reservation.reservationTime, 'HH:mm')}"></span>
 									</div>
 								</div>
 							</div>
@@ -65,13 +69,13 @@
 										<span class="fw-bold">来店人数</span>
 									</div>
 									<div class="col">
-										<span th:text="${reservationRegisterForm.numberOfPeople + '名'}"></span>
+										<span th:text="${reservation.getNumberOfPeople() + '名'}"></span>
 									</div>
 								</div>
 							</div>
 
 							<div class="d-flex justify-content-center">
-								<button type="submit" class="btn text-white shadow-sm w-100 kadai_002-btn">確定する</button>
+								<button type="submit" class="btn btn-danger shadow-sm w-100">キャンセルする</button>
 							</div>
 						</form>
 					</div>

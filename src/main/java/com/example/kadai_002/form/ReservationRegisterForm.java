@@ -1,19 +1,21 @@
 package com.example.kadai_002.form;
 
-import java.time.LocalDateTime;
+import java.time.LocalDate;
+import java.time.LocalTime;
 
-import lombok.AllArgsConstructor;
 import lombok.Data;
 
 @Data
-@AllArgsConstructor
+
 public class ReservationRegisterForm {
 	
 	private Integer storeId;
 	
 	private Integer userId;
 	
-	private LocalDateTime reservationDatetime;
+	private LocalTime reservationTime;
+	
+	private LocalDate reservationDate;
 	
 	private Integer numberOfPeople;
 	

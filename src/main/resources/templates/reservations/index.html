@@ -27,8 +27,8 @@
 
 						<h1 class="mb-3 text-center">予約一覧</h1>
 
-						<div th:if="${param.reserved}" class="alert alert-info">
-							予約が完了しました。
+						<div th:if="${successMessage}" class="alert alert-success">
+							<span th:text="${successMessage}"></span>
 						</div>
 
 						<table class="table">
@@ -37,6 +37,7 @@
 									<th scope="col">店舗名</th>
 									<th scope="col">来店日時</th>
 									<th scope="col">来店人数</th>
+									<th scope="col"></th>
 								</tr>
 							</thead>
 							<tbody>
@@ -45,8 +46,16 @@
 										<a th:href="@{/stores/__${reservation.getStore().getId()}__}"
 											th:text="${reservation.getStore().getName()}"></a>
 									</td>
-									<td th:text="${#temporals.format(reservation.reservationDatetime, 'yyyy-MM-dd HH:mm')}"></td>
+									<td
+										th:text="${#temporals.format(reservation.reservationDate, 'yyyy-MM-dd')} + ' ' + ${#temporals.format(reservation.reservationTime, 'HH:mm')}">
+									</td>
 									<td th:text="${reservation.getNumberOfPeople + '名'}"></td>
+									<td>
+									    <a th:if="${reservation.reservationDate.isAfter(T(java.time.LocalDate).now()) || 
+									                (reservation.reservationDate.isEqual(T(java.time.LocalDate).now()) && 
+									                 reservation.reservationTime.isAfter(T(java.time.LocalTime).now()))}"
+									       th:href="@{/reservations/{id}/cancel(id=${reservation.getId()})}"
+									       class="btn btn-danger btn-sm">キャンセル</a>
 									</td>
 								</tr>
 							</tbody>

@@ -60,34 +60,17 @@ INSERT IGNORE INTO category (id, name) VALUES (16, 'トースト');
 INSERT IGNORE INTO category (id, name) VALUES (17, 'ひつまぶし');
 
 -- usersテーブル
-INSERT IGNORE INTO users (id, name, furigana, date_of_birth, phone_number, email, password, role_id, enabled, created_at, updated_at) VALUES (1, '侍 太郎', 'サムライ タロウ', '2004-12-28', '090-1234-5678', 'taro.samurai@example.com', '$2a$10$2JNjTwZBwo7fprL2X4sv.OEKqxnVtsVQvuXDkI8xVGix.U3W5B7CO', 1, true, CURRENT_TIMESTAMP, CURRENT_TIMESTAMP);
-INSERT IGNORE INTO users (id, name, furigana, date_of_birth, phone_number, email, password, role_id, enabled, created_at, updated_at) VALUES (2, '侍 花子', 'サムライ ハナコ', '1964-12-08', '090-1234-5678', 'hanako.samurai@example.com', '$2a$10$2JNjTwZBwo7fprL2X4sv.OEKqxnVtsVQvuXDkI8xVGix.U3W5B7CO', 2, true, CURRENT_TIMESTAMP, CURRENT_TIMESTAMP);
-INSERT IGNORE INTO users (id, name, furigana, date_of_birth, phone_number, email, password, role_id, enabled, created_at, updated_at) VALUES (3, '侍 義勝', 'サムライ ヨシカツ', '1947-04-15', '090-1234-5678', 'yoshikatsu.samurai@example.com', '$2a$10$2JNjTwZBwo7fprL2X4sv.OEKqxnVtsVQvuXDkI8xVGix.U3W5B7CO', 1, false, CURRENT_TIMESTAMP, CURRENT_TIMESTAMP);
-INSERT IGNORE INTO users (id, name, furigana, date_of_birth, phone_number, email, password, role_id, enabled, created_at, updated_at) VALUES (4, '侍 幸美', 'サムライ サチミ', '1977-11-19', '090-1234-5678', 'sachimi.samurai@example.com', '$2a$10$2JNjTwZBwo7fprL2X4sv.OEKqxnVtsVQvuXDkI8xVGix.U3W5B7CO', 1, false, CURRENT_TIMESTAMP, CURRENT_TIMESTAMP);
-INSERT IGNORE INTO users (id, name, furigana, date_of_birth, phone_number, email, password, role_id, enabled, created_at, updated_at) VALUES (5, '侍 雅', 'サムライ ミヤビ', '1940-04-12', '090-1234-5678', 'miyabi.samurai@example.com', '$2a$10$2JNjTwZBwo7fprL2X4sv.OEKqxnVtsVQvuXDkI8xVGix.U3W5B7CO', 1, false, CURRENT_TIMESTAMP, CURRENT_TIMESTAMP);
-INSERT IGNORE INTO users (id, name, furigana, date_of_birth, phone_number, email, password, role_id, enabled, created_at, updated_at) VALUES (6, '侍 正保', 'サムライ マサヤス', '1962-11-20', '090-1234-5678', 'masayasu.samurai@example.com', '$2a$10$2JNjTwZBwo7fprL2X4sv.OEKqxnVtsVQvuXDkI8xVGix.U3W5B7CO', 1, false, CURRENT_TIMESTAMP, CURRENT_TIMESTAMP);
-INSERT IGNORE INTO users (id, name, furigana, date_of_birth, phone_number, email, password, role_id, enabled, created_at, updated_at) VALUES (7, '侍 真由美', 'サムライ マユミ', '1985-10-03', '090-1234-5678', 'mayumi.samurai@example.com', '$2a$10$2JNjTwZBwo7fprL2X4sv.OEKqxnVtsVQvuXDkI8xVGix.U3W5B7CO', 1, false, CURRENT_TIMESTAMP, CURRENT_TIMESTAMP);
-INSERT IGNORE INTO users (id, name, furigana, date_of_birth, phone_number, email, password, role_id, enabled, created_at, updated_at) VALUES (8, '侍 安民', 'サムライ ヤスタミ', '1998-02-07', '090-1234-5678', 'yasutami.samurai@example.com', '$2a$10$2JNjTwZBwo7fprL2X4sv.OEKqxnVtsVQvuXDkI8xVGix.U3W5B7CO', 1, false, CURRENT_TIMESTAMP, CURRENT_TIMESTAMP);
-INSERT IGNORE INTO users (id, name, furigana, date_of_birth, phone_number, email, password, role_id, enabled, created_at, updated_at) VALUES (9, '侍 章緒', 'サムライ アキオ', '2006-01-16', '090-1234-5678', 'akio.samurai@example.com', '$2a$10$2JNjTwZBwo7fprL2X4sv.OEKqxnVtsVQvuXDkI8xVGix.U3W5B7CO', 1, false, CURRENT_TIMESTAMP, CURRENT_TIMESTAMP);
-INSERT IGNORE INTO users (id, name, furigana, date_of_birth, phone_number, email, password, role_id, enabled, created_at, updated_at) VALUES (10, '侍 祐子', 'サムライ ユウコ', '1988-08-02', '090-1234-5678', 'yuko.samurai@example.com', '$2a$10$2JNjTwZBwo7fprL2X4sv.OEKqxnVtsVQvuXDkI8xVGix.U3W5B7CO', 1, false, CURRENT_TIMESTAMP, CURRENT_TIMESTAMP);
-INSERT IGNORE INTO users (id, name, furigana, date_of_birth, phone_number, email, password, role_id, enabled, created_at, updated_at) VALUES (11, '侍 秋美', 'サムライ アキミ', '1982-10-08', '090-1234-5678', 'akimi.samurai@example.com', '$2a$10$2JNjTwZBwo7fprL2X4sv.OEKqxnVtsVQvuXDkI8xVGix.U3W5B7CO', 1, false, CURRENT_TIMESTAMP, CURRENT_TIMESTAMP);
-INSERT IGNORE INTO users (id, name, furigana, date_of_birth, phone_number, email, password, role_id, enabled, created_at, updated_at) VALUES (12, '侍 信平', 'サムライ シンペイ', '1961-05-14', '090-1234-5678', 'shinpei.samurai@example.com', '$2a$10$2JNjTwZBwo7fprL2X4sv.OEKqxnVtsVQvuXDkI8xVGix.U3W5B7CO', 1, false, CURRENT_TIMESTAMP, CURRENT_TIMESTAMP);
 
 --reservationsテーブル
-INSERT IGNORE INTO reservations (store_id, user_id, reservation_datetime, number_of_people, created_at, updated_at) VALUES (1, 1, '2024-07-25 18:30:00', 2, CURRENT_TIMESTAMP, CURRENT_TIMESTAMP);
-INSERT IGNORE INTO reservations (store_id, user_id, reservation_datetime, number_of_people, created_at, updated_at) VALUES (2, 2, '2024-07-26 12:00:00', 4, CURRENT_TIMESTAMP, CURRENT_TIMESTAMP);
-INSERT IGNORE INTO reservations (store_id, user_id, reservation_datetime, number_of_people, created_at, updated_at) VALUES (3, 3, '2024-07-27 19:00:00', 3, CURRENT_TIMESTAMP, CURRENT_TIMESTAMP);
-INSERT IGNORE INTO reservations (store_id, user_id, reservation_datetime, number_of_people, created_at, updated_at) VALUES (4, 4, '2024-07-28 13:00:00', 5, CURRENT_TIMESTAMP, CURRENT_TIMESTAMP);
-INSERT IGNORE INTO reservations (store_id, user_id, reservation_datetime, number_of_people, created_at, updated_at) VALUES (5, 5, '2024-07-29 14:30:00', 2, CURRENT_TIMESTAMP, CURRENT_TIMESTAMP);
+INSERT IGNORE INTO reservations (store_id, user_id, reservation_date, reservation_time, number_of_people, created_at, updated_at) VALUES (1, 1, '2024-07-25', '18:30:00', 2, CURRENT_TIMESTAMP, CURRENT_TIMESTAMP);
+INSERT IGNORE INTO reservations (store_id, user_id, reservation_date, reservation_time, number_of_people, created_at, updated_at) VALUES (2, 2, '2024-07-26', '12:00:00', 4, CURRENT_TIMESTAMP, CURRENT_TIMESTAMP);
+INSERT IGNORE INTO reservations (store_id, user_id, reservation_date, reservation_time, number_of_people, created_at, updated_at) VALUES (3, 3, '2024-07-27', '19:00:00', 3, CURRENT_TIMESTAMP, CURRENT_TIMESTAMP);
+INSERT IGNORE INTO reservations (store_id, user_id, reservation_date, reservation_time, number_of_people, created_at, updated_at) VALUES (4, 4, '2024-07-28', '13:00:00', 5, CURRENT_TIMESTAMP, CURRENT_TIMESTAMP);
+INSERT IGNORE INTO reservations (store_id, user_id, reservation_date, reservation_time, number_of_people, created_at, updated_at) VALUES (5, 5, '2024-07-29', '14:30:00', 2, CURRENT_TIMESTAMP, CURRENT_TIMESTAMP);
 
 --reviewsテーブル
-INSERT IGNORE INTO reviews (id, store_id, user_id, rating, comment, timestamp) VALUES
-(1, 1, 1, 5, '素晴らしいサービスでした！', '2024-08-14T10:00:00'),
-(2, 2, 2, 4, '料理が美味しかったです。', '2024-08-14T11:00:00'),
-(3, 3, 3, 3, '普通の体験でした。', '2024-08-14T12:00:00'),
-(4, 4, 4, 2, 'サービスが少し遅かったです。', '2024-08-14T13:00:00'),
-(5, 5, 5, 1, '期待外れでした。', '2024-08-14T14:00:00');
 
+--rolesテーブル
 INSERT IGNORE INTO roles (id, name) VALUES 
 (1, 'ROLE_GENERAL'), 
 (2, 'ROLE_ADMIN'), 

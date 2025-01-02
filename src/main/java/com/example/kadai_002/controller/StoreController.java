@@ -17,7 +17,6 @@ import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestParam;
 
 import com.example.kadai_002.entity.Category;
-import com.example.kadai_002.entity.Review;
 import com.example.kadai_002.entity.Store;
 import com.example.kadai_002.entity.User;
 import com.example.kadai_002.form.ReservationInputForm;
@@ -69,7 +68,7 @@ public class StoreController {
 
 		return "stores/index";
 	}
-	
+
 	@PostMapping("/{id}/favorite")
 	public String addFavorite(@PathVariable(name = "id") Integer id, @AuthenticationPrincipal UserDetails userDetails) {
 		Store store = storeRepository.getReferenceById(id);
@@ -90,21 +89,20 @@ public class StoreController {
 	@GetMapping("/{id}")
 	public String show(@PathVariable(name = "id") Integer id, Model model,
 			@AuthenticationPrincipal UserDetails userDetails) {
-		Store store = storeRepository.getReferenceById(id);
-		List<Review> reviews = reviewRepository.findByStoreId(id);
+		Store store = storeRepository.findById(id)
+				.orElseThrow(() -> new IllegalArgumentException("Invalid store ID"));
 
-		// 店舗に関連するレビューのリストを取得
-	    model.addAttribute("store", store);
-	    model.addAttribute("reviews", reviews);  // レビューのリストをモデルに追加
-	    model.addAttribute("reservationInputForm", new ReservationInputForm());
-	    model.addAttribute("reviewInputForm", new ReviewInputForm());
+		model.addAttribute("store", store);
+		model.addAttribute("reviews", reviewRepository.findByStoreId(id));
+		model.addAttribute("reservationInputForm", new ReservationInputForm());
+		model.addAttribute("reviewInputForm", new ReviewInputForm());
 
 		if (userDetails != null) {
 			User user = userService.findByEmail(userDetails.getUsername());
 			boolean isFavorite = favoriteService.isFavorite(user, store);
 			model.addAttribute("isFavorite", isFavorite);
 		} else {
-			model.addAttribute("isFavorite", false); // 未認証の場合は false を設定
+			model.addAttribute("isFavorite", false);
 		}
 
 		return "stores/show";

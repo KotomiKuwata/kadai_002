@@ -66,8 +66,5 @@ public class Store {
 	@Column(name = "updated_at", insertable = false, updatable = false)
 	private Timestamp updatedAt;
 
-	// IDを基にしたコンストラクタを追加
-	public Store(Integer id) {
-		this.id = id;
-	}
+	
 }

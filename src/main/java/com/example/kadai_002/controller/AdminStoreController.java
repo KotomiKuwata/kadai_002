@@ -1,10 +1,8 @@
 package com.example.kadai_002.controller;
 
-
 import java.beans.PropertyEditorSupport;
-import java.sql.Time;
-import java.text.ParseException;
-import java.text.SimpleDateFormat;
+import java.time.LocalTime;
+import java.time.format.DateTimeParseException;
 import java.util.List;
 
 import org.springframework.beans.factory.annotation.Autowired;
@@ -42,14 +40,18 @@ public class AdminStoreController {
 	private final CategoryRepository categoryRepository;
 
 	@Autowired
-	public AdminStoreController(StoreRepository storeRepository, StoreService storeService, CategoryRepository categoryRepository) {
+	public AdminStoreController(StoreRepository storeRepository, StoreService storeService,
+			CategoryRepository categoryRepository) {
 		this.storeRepository = storeRepository;
 		this.storeService = storeService;
 		this.categoryRepository = categoryRepository;
 	}
 
 	@GetMapping
-	public String index(Model model, @PageableDefault(page = 0, size = 10, sort = "id", direction = Direction.ASC) Pageable pageable, @RequestParam(name = "keyword", required = false) String keyword,@RequestParam(name = "categoryName", required = false) String categoryName) {
+	public String index(Model model,
+			@PageableDefault(page = 0, size = 10, sort = "id", direction = Direction.ASC) Pageable pageable,
+			@RequestParam(name = "keyword", required = false) String keyword,
+			@RequestParam(name = "categoryName", required = false) String categoryName) {
 		Page<Store> storePage;
 
 		if (categoryName != null && !categoryName.isEmpty()) {
@@ -64,8 +66,8 @@ public class AdminStoreController {
 		model.addAttribute("keyword", keyword);
 		model.addAttribute("categoryName", categoryName);
 		List<Category> categories = categoryRepository.findAll();
-        model.addAttribute("categories", categories);
-        
+		model.addAttribute("categories", categories);
+
 		return "admin/stores/index";
 	}
 
@@ -84,7 +86,7 @@ public class AdminStoreController {
 		return "admin/stores/register";
 	}
 
-	@InitBinder
+	/*@InitBinder
 	protected void initBinder(WebDataBinder binder) {
 		binder.registerCustomEditor(Time.class, new PropertyEditorSupport() {
 			@Override
@@ -97,17 +99,38 @@ public class AdminStoreController {
 					setValue(null);
 				}
 			}
-
+	
 			@Override
 			public String getAsText() {
 				Time value = (Time) getValue();
 				return (value != null ? value.toString() : "");
 			}
 		});
+	}*/
+
+	@InitBinder
+	protected void initBinder(WebDataBinder binder) {
+		binder.registerCustomEditor(LocalTime.class, new PropertyEditorSupport() {
+			@Override
+			public void setAsText(String text) throws IllegalArgumentException {
+				try {
+					setValue(LocalTime.parse(text));
+				} catch (DateTimeParseException e) {
+					throw new IllegalArgumentException("Invalid time format. Use HH:mm", e);
+				}
+			}
+
+			@Override
+			public String getAsText() {
+				LocalTime value = (LocalTime) getValue();
+				return (value != null ? value.toString() : "");
+			}
+		});
 	}
 
 	@PostMapping("/create")
-	public String create(@ModelAttribute @Validated StoreRegisterForm storeRegisterForm, BindingResult bindingResult, Model model, RedirectAttributes redirectAttributes) {
+	public String create(@ModelAttribute @Validated StoreRegisterForm storeRegisterForm, BindingResult bindingResult,
+			Model model, RedirectAttributes redirectAttributes) {
 		if (bindingResult.hasErrors()) {
 			List<Category> categories = categoryRepository.findAll();
 			model.addAttribute("categories", categories);
@@ -124,7 +147,9 @@ public class AdminStoreController {
 		Store store = storeRepository.getReferenceById(id);
 		List<Category> categories = categoryRepository.findAll();
 		String imageName = store.getImageName();
-		StoreEditForm storeEditForm = new StoreEditForm(store.getId(), store.getName(), null, store.getDescription(), store.getOpeningHours(), store.getClosingTime(), store.getPostalCode(), store.getAddress(), store.getPhoneNumber(), store.getClosedDay(), store.getCategoryId());
+		StoreEditForm storeEditForm = new StoreEditForm(store.getId(), store.getName(), null, store.getDescription(),
+				store.getOpeningHours(), store.getClosingTime(), store.getPostalCode(), store.getAddress(),
+				store.getPhoneNumber(), store.getClosedDay(), store.getCategoryId());
 
 		model.addAttribute("imageName", imageName);
 		model.addAttribute("storeEditForm", storeEditForm);
@@ -134,7 +159,8 @@ public class AdminStoreController {
 	}
 
 	@PostMapping("/{id}/update")
-	public String update(@ModelAttribute @Validated StoreEditForm storeEditForm, BindingResult bindingResult, RedirectAttributes redirectAttributes) {        
+	public String update(@ModelAttribute @Validated StoreEditForm storeEditForm, BindingResult bindingResult,
+			RedirectAttributes redirectAttributes) {
 		if (bindingResult.hasErrors()) {
 			return "admin/stores/edit";
 		}
@@ -143,16 +169,15 @@ public class AdminStoreController {
 		redirectAttributes.addFlashAttribute("successMessage", "店舗情報を編集しました。");
 
 		return "redirect:/admin/stores";
-	} 
+	}
 
 	@PostMapping("/{id}/delete")
-	public String delete(@PathVariable(name = "id") Integer id, RedirectAttributes redirectAttributes) {        
+	public String delete(@PathVariable(name = "id") Integer id, RedirectAttributes redirectAttributes) {
 		storeRepository.deleteById(id);
 
 		redirectAttributes.addFlashAttribute("successMessage", "店舗情報を削除しました。");
 
 		return "redirect:/admin/stores";
-	} 
-	
+	}
 
 }

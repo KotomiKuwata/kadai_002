@@ -144,7 +144,6 @@
 											<span th:text="${store.getClosedDay()}"></span>
 										</div>
 									</div>
-
 									<div class="row pb-2 mb-2 border-bottom">
 										<div class="col-4">
 											<span class="fw-bold">カテゴリ</span>
@@ -238,29 +237,81 @@
 								<div sec:authorize="isAuthenticated()" class="col-lg-4 px-0 ps-lg-4 mb-4">
 									<div class="card">
 										<div class="card-body">
-
 											<form method="get"
-												th:action="@{/stores/__${store.getId}__/reservations/input}"
-												th:object="${reservationInputForm}">
+												th:action="@{/stores/{id}/reservations/input(id=${store.id})}"
+												th:object="${reservationInputForm}" th:data-store-id="${store.id}">
 												<div class="form-group mb-2">
-													<label for="reservationDatetime"
-														class="col-form-label text-md-left fw-bold">来店日時</label>
-													<div th:if="${#fields.hasErrors('reservationDatetime')}"
-														class="text-danger small mb-2"
-														th:errors="*{reservationDatetime}">
-													</div>
-													<input type="datetime-local" class="form-control"
-														th:field="*{reservationDatetime}" step="1800">
+													<label for="reservationDate"
+														class="col-form-label text-md-left fw-bold">来店日</label>
+													<input class="form-control" id="reservationDate"
+														name="reservationDate" th:field="*{reservationDate}"
+														autocomplete="off" required />
 												</div>
-
+												<div class="form-group mb-2">
+													<label for="reservationTime"
+														class="col-form-label text-md-left fw-bold">来店時間</label>
+													<select class="form-control" id="reservationTime"
+														name="reservationTime" th:field="*{reservationTime}" required>
+														<option value="">選択してください</option>
+														<option value="00:00">00:00</option>
+														<option value="00:30">00:30</option>
+														<option value="01:00">01:00</option>
+														<option value="01:30">01:30</option>
+														<option value="02:00">02:00</option>
+														<option value="02:30">02:30</option>
+														<option value="03:00">03:00</option>
+														<option value="03:30">03:30</option>
+														<option value="04:00">04:00</option>
+														<option value="04:30">04:30</option>
+														<option value="05:00">05:00</option>
+														<option value="05:30">05:30</option>
+														<option value="06:00">06:00</option>
+														<option value="06:30">06:30</option>
+														<option value="07:00">07:00</option>
+														<option value="07:30">07:30</option>
+														<option value="08:00">08:00</option>
+														<option value="08:30">08:30</option>
+														<option value="09:00">09:00</option>
+														<option value="09:30">09:30</option>
+														<option value="10:00">10:00</option>
+														<option value="10:30">10:30</option>
+														<option value="11:00">11:00</option>
+														<option value="11:30">11:30</option>
+														<option value="12:00">12:00</option>
+														<option value="12:30">12:30</option>
+														<option value="13:00">13:00</option>
+														<option value="13:30">13:30</option>
+														<option value="14:00">14:00</option>
+														<option value="14:30">14:30</option>
+														<option value="15:00">15:00</option>
+														<option value="15:30">15:30</option>
+														<option value="16:00">16:00</option>
+														<option value="16:30">16:30</option>
+														<option value="17:00">17:00</option>
+														<option value="17:30">17:30</option>
+														<option value="18:00">18:00</option>
+														<option value="18:30">18:30</option>
+														<option value="19:00">19:00</option>
+														<option value="19:30">19:30</option>
+														<option value="20:00">20:00</option>
+														<option value="20:30">20:30</option>
+														<option value="21:00">21:00</option>
+														<option value="21:30">21:30</option>
+														<option value="22:00">22:00</option>
+														<option value="22:30">22:30</option>
+														<option value="23:00">23:00</option>
+														<option value="23:30">23:30</option>
+														<option value="24:00">24:00</option>
+													</select>
+												</div>
 												<div class="form-group mb-4">
 													<label for="numberOfPeople"
 														class="col-form-label text-md-left fw-bold">来店人数</label>
 													<div th:if="${#fields.hasErrors('numberOfPeople')}"
 														class="text-danger small mb-2" th:errors="*{numberOfPeople}">
 													</div>
-													<input type="number" class="form-control"
-														th:field="*{numberOfPeople}" min="1">
+													<input type="number" class="form-control" id="numberOfPeople"
+														name="numberOfPeople" th:field="*{numberOfPeople}" min="1">
 												</div>
 												<div class="form-group d-flex justify-content-center my-4">
 													<button type="submit"
@@ -283,8 +334,10 @@
 	<!-- Flatpickr -->
 	<script src="https://cdn.jsdelivr.net/npm/flatpickr"></script>
 	<script src="https://cdn.jsdelivr.net/npm/flatpickr/dist/l10n/ja.js"></script>
+	<script>
+		flatpickr.localize(flatpickr.l10ns.ja);
+	</script>
 	<script th:src="@{/js/reservations.js}"></script>
-
 	<div th:replace="~{fragment :: scripts}"></div>
 </body>
 

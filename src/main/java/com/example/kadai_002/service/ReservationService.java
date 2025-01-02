@@ -1,10 +1,11 @@
 package com.example.kadai_002.service;
 
+import java.time.DayOfWeek;
+import java.time.LocalDate;
 import java.time.LocalDateTime;
 import java.time.LocalTime;
 
 import org.springframework.stereotype.Service;
-import org.springframework.transaction.annotation.Transactional;
 
 import com.example.kadai_002.entity.Reservation;
 import com.example.kadai_002.entity.Store;
@@ -14,18 +15,22 @@ import com.example.kadai_002.repository.ReservationRepository;
 import com.example.kadai_002.repository.StoreRepository;
 import com.example.kadai_002.repository.UserRepository;
 
+import jakarta.transaction.Transactional;
+
 @Service
 public class ReservationService {
 
 	private final ReservationRepository reservationRepository;
 	private final StoreRepository storeRepository;
 	private final UserRepository userRepository;
+	private final StoreService storeService;
 
 	public ReservationService(ReservationRepository reservationRepository, StoreRepository storeRepository,
-			UserRepository userRepository) {
+			UserRepository userRepository, StoreService storeService) {
 		this.reservationRepository = reservationRepository;
 		this.storeRepository = storeRepository;
 		this.userRepository = userRepository;
+		this.storeService = storeService;
 	}
 
 	@Transactional
@@ -34,47 +39,79 @@ public class ReservationService {
 			Reservation reservation = new Reservation();
 			Store store = storeRepository.getReferenceById(reservationRegisterForm.getStoreId());
 			User user = userRepository.getReferenceById(reservationRegisterForm.getUserId());
-			LocalDateTime reservationDatetime = reservationRegisterForm.getReservationDatetime();
+			LocalTime reservationTime = reservationRegisterForm.getReservationTime();
+			LocalDate reservationDate = reservationRegisterForm.getReservationDate();
 
 			reservation.setStore(store);
 			reservation.setUser(user);
-			reservation.setReservationDatetime(reservationDatetime);
+			reservation.setReservationTime(reservationTime);
+			reservation.setReservationDate(reservationDate);
 			reservation.setNumberOfPeople(reservationRegisterForm.getNumberOfPeople());
 
 			reservationRepository.save(reservation);
-			System.out.println("Reservation saved successfully: " + reservation);
 		} catch (Exception e) {
-			System.err.println("Error occurred while saving reservation: " + e.getMessage());
-			throw e; // 再スローしてトランザクションをロールバック
+			throw e; // トランザクションロールバック
 		}
 	}
 
 	public boolean isValidReservationTime(Store store, LocalDateTime reservationDateTime) {
 
-		LocalTime openingHours = store.getOpeningHours(); //開店時間の取得(例 10.17.17.17)
-		LocalTime closingTime = store.getClosingTime(); //閉店時間の取得 (例 19.0.2.5)
-		LocalTime reservationTime = reservationDateTime.toLocalTime(); //予約時間の取得
-		LocalTime lastReservationTime = closingTime.minusHours(2); //最終予約受付時間（閉店２時間前 例 17.22.0.3）
+		LocalTime openingHours = store.getOpeningHours();
+		LocalTime closingTime = store.getClosingTime();
+		LocalTime reservationTime = reservationDateTime.toLocalTime();
+		LocalTime lastReservationTime = closingTime;
 
-		//予約開始時間
 		boolean isValidStartTime = openingHours.equals(reservationTime) || openingHours.isBefore(reservationTime);
 
-		// 日付をまたがない予約受付時間
 		boolean isBeforeOrAtLastReservation = lastReservationTime.isAfter(reservationTime)
 				|| reservationTime.equals(lastReservationTime);
 
-		// 日付を跨ぐ予約受付時間
-		boolean isAfterMidnight = openingHours.isAfter(reservationTime) && openingHours.isAfter(lastReservationTime);
+		return isValidStartTime && isBeforeOrAtLastReservation;
+	}
 
-		//日付を跨ぐ閉店時間
-		boolean closingTimeisAfterMidnight = closingTime.isBefore(openingHours)
-				&& !closingTime.equals(LocalTime.MIDNIGHT);
+	public boolean isValidReservation(Store store, LocalDateTime reservationDateTime) {
+		// 定休日チェック
+		if (storeService.isClosedDay(store, reservationDateTime.toLocalDate())) {
+			return false;
+		}
 
-		return (//営業時間が日付をまたがない場合 openingHours < reservationTime < lastReservationTime
-		isValidStartTime && isBeforeOrAtLastReservation)
-				||
-				(//営業時間が日付を跨ぐ場合 openingHours < reservationTime > 0 
-				isAfterMidnight && isBeforeOrAtLastReservation || isValidStartTime && closingTimeisAfterMidnight);
+		LocalTime reservationTime = reservationDateTime.toLocalTime();
+		LocalTime openingHours = store.getOpeningHours();
+		LocalTime closingTime = store.getClosingTime();
+		LocalTime lastReservationTime = closingTime.minusHours(2);
 
+		// 営業時間内かつ最終予約時間前かチェック
+		return !reservationTime.isBefore(openingHours) &&
+				!reservationTime.isAfter(lastReservationTime);
+	}
+
+	private boolean isClosedDay(Store store, LocalDate date) {
+		String closedDay = store.getClosedDay();
+		if (closedDay == null || closedDay.isEmpty()) {
+			return false;
+		}
+
+		DayOfWeek dayOfWeek = date.getDayOfWeek();
+		String[] closedDays = store.getClosedDay().split(",");
+
+		for (String day : closedDays) {
+			if (matchesJapaneseDayOfWeek(day.trim(), dayOfWeek)) {
+				return true;
+			}
+		}
+		return false;
+	}
+
+	private boolean matchesJapaneseDayOfWeek(String japaneseDayName, DayOfWeek dayOfWeek) {
+		return switch (japaneseDayName) {
+		case "月曜日" -> dayOfWeek == DayOfWeek.MONDAY;
+		case "火曜日" -> dayOfWeek == DayOfWeek.TUESDAY;
+		case "水曜日" -> dayOfWeek == DayOfWeek.WEDNESDAY;
+		case "木曜日" -> dayOfWeek == DayOfWeek.THURSDAY;
+		case "金曜日" -> dayOfWeek == DayOfWeek.FRIDAY;
+		case "土曜日" -> dayOfWeek == DayOfWeek.SATURDAY;
+		case "日曜日" -> dayOfWeek == DayOfWeek.SUNDAY;
+		default -> false;
+		};
 	}
 }

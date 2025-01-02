@@ -2,113 +2,112 @@ package com.example.kadai_002.controller;
 
 import java.time.LocalDateTime;
 
-import org.springframework.data.domain.Page;
-import org.springframework.data.domain.Pageable;
-import org.springframework.data.domain.Sort.Direction;
-import org.springframework.data.web.PageableDefault;
 import org.springframework.security.core.annotation.AuthenticationPrincipal;
 import org.springframework.stereotype.Controller;
 import org.springframework.ui.Model;
 import org.springframework.validation.BindingResult;
-import org.springframework.validation.FieldError;
 import org.springframework.validation.annotation.Validated;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.ModelAttribute;
 import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.PostMapping;
+import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.servlet.mvc.support.RedirectAttributes;
 
-import com.example.kadai_002.entity.Reservation;
 import com.example.kadai_002.entity.Store;
-import com.example.kadai_002.entity.User;
 import com.example.kadai_002.form.ReservationInputForm;
 import com.example.kadai_002.form.ReservationRegisterForm;
-import com.example.kadai_002.form.ReviewInputForm;
 import com.example.kadai_002.repository.ReservationRepository;
-import com.example.kadai_002.repository.ReviewRepository;
 import com.example.kadai_002.repository.StoreRepository;
+import com.example.kadai_002.repository.UserRepository;
 import com.example.kadai_002.security.UserDetailsImpl;
 import com.example.kadai_002.service.ReservationService;
 
 @Controller
+@RequestMapping("/stores/{storeId}/reservations")
 public class ReservationController {
+
+	private final ReservationService reservationService;
 	private final ReservationRepository reservationRepository;
 	private final StoreRepository storeRepository;
-	private final ReservationService reservationService;
-	private final ReviewRepository reviewRepository;
+	private final UserRepository userRepository;
 
-	public ReservationController(ReviewRepository reviewRepository, ReservationRepository reservationRepository,
-			StoreRepository storeRepository,
-			ReservationService reservationService) {
-		this.reservationRepository = reservationRepository;
-		this.storeRepository = storeRepository;
+	public ReservationController(ReservationService reservationService, StoreRepository storeRepository,
+			UserRepository userRepository, ReservationRepository reservationRepository) {
 		this.reservationService = reservationService;
-		this.reviewRepository = reviewRepository;
+		this.storeRepository = storeRepository;
+		this.userRepository = userRepository;
+		this.reservationRepository = reservationRepository;
 	}
 
-	@GetMapping("/reservations")
-	public String index(@AuthenticationPrincipal UserDetailsImpl userDetailsImpl,
-			@PageableDefault(page = 0, size = 10, sort = "id", direction = Direction.ASC) Pageable pageable,
+	@GetMapping("/input")
+	public String input(@PathVariable("storeId") Integer storeId,
+			@ModelAttribute @Validated ReservationInputForm reservationInputForm,
+			BindingResult bindingResult,
+			RedirectAttributes redirectAttributes,
 			Model model) {
-		User user = userDetailsImpl.getUser();
-		Page<Reservation> reservationPage = reservationRepository.findByUserOrderByCreatedAtDesc(user, pageable);
 
-		model.addAttribute("reservationPage", reservationPage);
+		Store store = storeRepository.findById(storeId)
+				.orElseThrow(() -> new IllegalArgumentException("Invalid store ID"));
 
-		return "reservations/index";
+		if (reservationInputForm.getReservationDate() != null &&
+				reservationInputForm.getReservationTime() != null) {
+
+			LocalDateTime reservationDateTime = LocalDateTime.of(
+					reservationInputForm.getReservationDate(),
+					reservationInputForm.getReservationTime());
+
+			if (!reservationService.isValidReservation(store, reservationDateTime)) {
+				bindingResult.rejectValue("reservationTime", "error.reservationTime",
+						"選択された日時は予約できません。");
+			}
+		}
+
+		if (bindingResult.hasErrors()) {
+			model.addAttribute("store", store);
+			return "stores/show";
+		}
+
+		redirectAttributes.addFlashAttribute("reservationInputForm", reservationInputForm);
+		return "redirect:/stores/" + storeId + "/reservations/confirm";
 	}
 
-	@GetMapping("/stores/{id}/reservations/input")
-	public String input(@PathVariable("id") Integer id,
-	@ModelAttribute @Validated ReservationInputForm reservationInputForm,
-	BindingResult bindingResult,
-	RedirectAttributes redirectAttributes,
-	Model model) {
-	Store store = storeRepository.getReferenceById(id);
-
-	if (reservationInputForm.getReservationDatetime() != null &&
-	!reservationService.isValidReservationTime(store, reservationInputForm.getReservationDatetime())) {
-	FieldError fieldError = new FieldError(bindingResult.getObjectName(), "reservationDatetime", "ネット予約は開店時間〜閉店時間2時間前までです。");
-	bindingResult.addError(fieldError);
-	}
-
-	// 再度バリデーションチェック
-	if (bindingResult.hasErrors()) {
-	model.addAttribute("store", store);
-	model.addAttribute("reviewInputForm", new ReviewInputForm());
-	model.addAttribute("reservationInputForm", reservationInputForm); // 追加
-	model.addAttribute("errorMessage", "予約内容に不備があります。");
-	return "stores/show";
-	}
-
-	redirectAttributes.addFlashAttribute("reservationInputForm", reservationInputForm);
-
-	return "redirect:/stores/{id}/reservations/confirm";
-	}
-
-	@GetMapping("/stores/{id}/reservations/confirm")
-	public String confirm(@PathVariable(name = "id") Integer id,
+	/*@GetMapping("/confirm")
+	public String confirm(@PathVariable("storeId") Integer storeId,
 			@ModelAttribute ReservationInputForm reservationInputForm,
-			@AuthenticationPrincipal UserDetailsImpl userDetailsImpl,
 			Model model) {
-		Store store = storeRepository.getReferenceById(id);
-		User user = userDetailsImpl.getUser();
+		Store store = storeRepository.findById(storeId)
+				.orElseThrow(() -> new IllegalArgumentException("Invalid store ID"));
+		model.addAttribute("store", store);
+		model.addAttribute("reservationInputForm", reservationInputForm);
+		return "reservations/confirm";
+	}*/
 
-		LocalDateTime reservationDatetime = reservationInputForm.getReservationDatetime();
+	@GetMapping("/confirm")
+	public String confirm(@PathVariable("storeId") Integer storeId,
+			@ModelAttribute ReservationInputForm reservationInputForm,
+			@AuthenticationPrincipal UserDetailsImpl userDetails,
+			Model model) {
+		Store store = storeRepository.findById(storeId)
+				.orElseThrow(() -> new IllegalArgumentException("Invalid store ID"));
 
-		ReservationRegisterForm reservationRegisterForm = new ReservationRegisterForm(store.getId(), user.getId(),
-				reservationInputForm.getReservationDatetime(), reservationInputForm.getNumberOfPeople());
+		ReservationRegisterForm reservationRegisterForm = new ReservationRegisterForm();
+		reservationRegisterForm.setStoreId(storeId);
+		reservationRegisterForm.setUserId(userDetails.getId()); // UserDetailsImplから直接IDを取得
+		reservationRegisterForm.setReservationDate(reservationInputForm.getReservationDate());
+		reservationRegisterForm.setReservationTime(reservationInputForm.getReservationTime());
+		reservationRegisterForm.setNumberOfPeople(reservationInputForm.getNumberOfPeople());
 
 		model.addAttribute("store", store);
 		model.addAttribute("reservationRegisterForm", reservationRegisterForm);
-
 		return "reservations/confirm";
 	}
 
-	@PostMapping("/stores/{id}/reservations/create")
-	public String create(@ModelAttribute ReservationRegisterForm reservationRegisterForm) {
+	@PostMapping("/create")
+	public String create(@ModelAttribute ReservationRegisterForm reservationRegisterForm,
+			RedirectAttributes redirectAttributes) {
 		reservationService.create(reservationRegisterForm);
-
-		return "redirect:/reservations?reserved";
+		redirectAttributes.addFlashAttribute("successMessage", "予約が完了しました。");
+		return "redirect:/reservations"; // 予約一覧ページにリダイレクト
 	}
 }
